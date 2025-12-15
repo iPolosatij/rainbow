@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Опыт Ньютона с призмой и светофильтрами</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            color: #3498db;
+            margin-bottom: 30px;
+        }
+        .demo-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 400px;
+            margin: 30px 0;
+            position: relative;
+        }
+        .light-source {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #ffffff, #ffff00);
+            border-radius: 50%;
+            box-shadow: 0 0 40px yellow;
+            position: relative;
+            z-index: 2;
+        }
+        .prism-container {
+            position: relative;
+            z-index: 3;
+        }
+        .prism {
+            width: 140px;
+            height: 200px;
+            background: rgba(255,255,255,0.9);
+            clip-path: polygon(0 0, 100% 50%, 0 100%);
+            position: relative;
+            border: 3px solid #bdc3c7;
+        }
+        .prism::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0.9) 0%, 
+                rgba(200,200,255,0.7) 100%);
+            clip-path: polygon(0 0, 100% 50%, 0 100%);
+        }
+        .spectrum-output {
+            width: 350px;
+            height: 100px;
+            background: linear-gradient(90deg, 
+                #8b00ff 0%, #4b0082 15%, #0000ff 25%, 
+                #008000 45%, #ffff00 60%, #ff7f00 75%, #ff0000 100%);
+            border-radius: 10px;
+            margin-left: 40px;
+            position: relative;
+            box-shadow: 0 0 25px rgba(255,255,255,0.4);
+        }
+        .filters-panel {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            width: 70px;
+            height: 70px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+        }
+        .filter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .filter-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px currentColor;
+            border: 3px solid white;
+        }
+        .explanation {
+            background: rgba(41, 128, 185, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        .light-beam {
+            position: absolute;
+            height: 4px;
+            background: white;
+            box-shadow: 0 0 15px white;
+            transition: all 0.5s ease;
+            z-index: 1;
+            transform-origin: left center;
+        }
+        .refracted-beam {
+            position: absolute;
+            height: 4px;
+            transition: all 0.5s ease;
+            z-index: 2;
+            transform-origin: left center;
+        }
+        .wavelength-label {
+            position: absolute;
+            top: -25px;
+            font-size: 11px;
+            background: rgba(0,0,0,0.8);
+            padding: 3px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .info-box {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .info-card {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .experiment-info {
+            text-align: center;
+            margin: 20px 0;
+            font-style: italic;
+            color: #f39c12;
+        }
+        .current-filter {
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(52, 152, 219, 0.3);
+            border-radius: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 Опыт Ньютона: Разложение белого света через призму</h1>
+        
+        <div class="experiment-info">
+            "Знаменитый эксперимент Исаака Ньютона, 1666 год"
+        </div>
+
+        <div class="explanation">
+            <h3>🎯 Научный принцип:</h3>
+            <p>Белый свет состоит из всех цветов радуги! Призма разделяет их благодаря разной степени преломления. 
+            Каждый светофильтр пропускает только свой цвет и блокирует все остальные.</p>
+        </div>
+
+        <!-- Панель светофильтров -->
+        <div class="filters-panel">
+            <button class="filter-btn active" onclick="setFilter('white')" style="background: linear-gradient(45deg, #8b00ff, #ff0000);">
+                🌈<br>Без фильтра
+            </button>
+            <button class="filter-btn" onclick="setFilter('violet')" style="background: #8b00ff;">
+                🟣<br>Фиолетовый
+            </button>
+            <button class="filter-btn" onclick="setFilter('blue')" style="background: #0000ff;">
+                🔵<br>Синий
+            </button>
+            <button class="filter-btn" onclick="setFilter('green')" style="background: #00ff00;">
+                🟢<br>Зеленый
+            </button>
+            <button class="filter-btn" onclick="setFilter('yellow')" style="background: #ffff00;">
+                🟡<br>Желтый
+            </button>
+            <button class="filter-btn" onclick="setFilter('orange')" style="background: #ff7f00;">
+                🟠<br>Оранжевый
+            </button>
+            <button class="filter-btn" onclick="setFilter('red')" style="background: #ff0000;">
+                🔴<br>Красный
+            </button>
+        </div>
+
+        <div class="current-filter" id="currentFilter">
+            🌈 Без фильтра - видна вся радуга!
+        </div>
+
+        <div class="demo-area">
+            <div class="light-source" id="lightSource"></div>
+            
+            <div class="prism-container" id="prismContainer">
+                <div class="prism" id="prism"></div>
+            </div>
+            
+            <div class="spectrum-output" id="spectrumOutput">
+                <div class="wavelength-label" style="left: 0;">380 нм</div>
+                <div class="wavelength-label" style="left: 25%;">480 нм</div>
+                <div class="wavelength-label" style="left: 45%;">550 нм</div>
+                <div class="wavelength-label" style="left: 60%;">580 нм</div>
+                <div class="wavelength-label" style="right: 0;">750 нм</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-card">
+                <h4>🔍 Открытие Ньютона</h4>
+                <p>Ньютон доказал, что белый свет сложный, а не простой, как думали раньше</p>
+            </div>
+            
+            <div class="info-card">
+                <h4>🎨 Светофильтры</h4>
+                <p>Каждый фильтр пропускает только свой цвет и поглощает все остальные</p>
+            </div>
+            
+            <div class="info-card">
+                <h4>🌈 ROYGBIV</h4>
+                <p>Red, Orange, Yellow, Green, Blue, Indigo, Violet - порядок цветов в радуге</p>
+            </div>
+        </div>
+
+        <div class="explanation">
+            <h3>🔬 Что происходит с фильтрами:</h3>
+            <p>• <strong style="color:#8b00ff">Фиолетовый фильтр</strong> - пропускает только фиолетовый свет (380-450 нм)<br>
+            • <strong style="color:#0000ff">Синий фильтр</strong> - пропускает только синий свет (450-495 нм)<br>
+            • <strong style="color:#00ff00">Зеленый фильтр</strong> - пропускает только зеленый свет (495-570 нм)<br>
+            • <strong style="color:#ffff00">Желтый фильтр</strong> - пропускает только желтый свет (570-590 нм)<br>
+            • <strong style="color:#ff7f00">Оранжевый фильтр</strong> - пропускает только оранжевый свет (590-620 нм)<br>
+            • <strong style="color:#ff0000">Красный фильтр</strong> - пропускает только красный свет (620-750 нм)<br>
+            • <strong>Без фильтра</strong> - видна вся радуга!</p>
+        </div>
+    </div>
+
+    <script>
+        const lightSource = document.getElementById('lightSource');
+        const prismContainer = document.getElementById('prismContainer');
+        const currentFilter = document.getElementById('currentFilter');
+
+        let currentFilterType = 'white';
+
+        // Цвета спектра с физическими параметрами (угол 90 градусов - вертикальное падение)
+        const spectrumColors = [
+            { wavelength: 380, color: '#8b00ff', name: 'Фиолетовый', angle: -20, filter: 'violet' },
+            { wavelength: 420, color: '#4b0082', name: 'Сине-фиолетовый', angle: -18, filter: 'violet' },
+            { wavelength: 470, color: '#0000ff', name: 'Синий', angle: -14, filter: 'blue' },
+            { wavelength: 495, color: '#0080ff', name: 'Голубой', angle: -10, filter: 'blue' },
+            { wavelength: 530, color: '#00ff00', name: 'Зеленый', angle: -6, filter: 'green' },
+            { wavelength: 560, color: '#80ff00', name: 'Желто-зеленый', angle: -2, filter: 'green' },
+            { wavelength: 575, color: '#ffff00', name: 'Желтый', angle: 0, filter: 'yellow' },
+            { wavelength: 590, color: '#ffaa00', name: 'Желто-оранжевый', angle: 2, filter: 'yellow' },
+            { wavelength: 610, color: '#ff7f00', name: 'Оранжевый', angle: 6, filter: 'orange' },
+            { wavelength: 630, color: '#ff5500', name: 'Красно-оранжевый', angle: 10, filter: 'orange' },
+            { wavelength: 650, color: '#ff0000', name: 'Красный', angle: 14, filter: 'red' },
+            { wavelength: 700, color: '#cc0000', name: 'Темно-красный', angle: 18, filter: 'red' }
+        ];
+
+        function setFilter(filterType) {
+            currentFilterType = filterType;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Обновляем текст текущего фильтра
+            const filterNames = {
+                'white': '🌈 Без фильтра - видна вся радуга!',
+                'violet': '🟣 Фиолетовый фильтр - проходит только фиолетовый свет',
+                'blue': '🔵 Синий фильтр - проходит только синий свет', 
+                'green': '🟢 Зеленый фильтр - проходит только зеленый свет',
+                'yellow': '🟡 Желтый фильтр - проходит только желтый свет',
+                'orange': '🟠 Оранжевый фильтр - проходит только оранжевый свет',
+                'red': '🔴 Красный фильтр - проходит только красный свет'
+            };
+            currentFilter.textContent = filterNames[filterType];
+            
+            updatePrismDemo();
+        }
+
+        function updatePrismDemo() {
+            // Обновляем свечение источника света в зависимости от фильтра
+            const filterColors = {
+                'white': 'radial-gradient(circle, #ffffff, #ffff00)',
+                'violet': 'radial-gradient(circle, #cc99ff, #8b00ff)',
+                'blue': 'radial-gradient(circle, #6666ff, #0000ff)',
+                'green': 'radial-gradient(circle, #66ff66, #00ff00)',
+                'yellow': 'radial-gradient(circle, #ffff66, #ffff00)',
+                'orange': 'radial-gradient(circle, #ffcc66, #ff7f00)',
+                'red': 'radial-gradient(circle, #ff6666, #ff0000)'
+            };
+            lightSource.style.background = filterColors[currentFilterType];
+            lightSource.style.boxShadow = `0 0 40px ${getFilterColor(currentFilterType)}`;
+            
+            // Очищаем предыдущие лучи
+            document.querySelectorAll('.light-beam, .refracted-beam').forEach(el => el.remove());
+            
+            createLightBeams();
+        }
+
+        function getFilterColor(filterType) {
+            const colors = {
+                'white': 'yellow',
+                'violet': '#8b00ff',
+                'blue': '#0000ff', 
+                'green': '#00ff00',
+                'yellow': '#ffff00',
+                'orange': '#ff7f00',
+                'red': '#ff0000'
+            };
+            return colors[filterType];
+        }
+
+        function createLightBeams() {
+            const prismRect = prismContainer.getBoundingClientRect();
+            const sourceRect = lightSource.getBoundingClientRect();
+            const containerRect = document.querySelector('.demo-area').getBoundingClientRect();
+            
+            // Центр призмы
+            const prismCenterX = prismRect.left + prismRect.width / 2 - containerRect.left;
+            const prismCenterY = prismRect.top + prismRect.height / 2 - containerRect.top;
+            
+            // Падающий луч
+            const incidentBeam = document.createElement('div');
+            incidentBeam.className = 'light-beam';
+            incidentBeam.style.width = '180px';
+            incidentBeam.style.left = (sourceRect.right - containerRect.left + 15) + 'px';
+            incidentBeam.style.top = (sourceRect.top + sourceRect.height/2 - containerRect.top - 2) + 'px';
+            incidentBeam.style.background = getFilterColor(currentFilterType);
+            incidentBeam.style.boxShadow = `0 0 15px ${getFilterColor(currentFilterType)}`;
+            document.querySelector('.demo-area').appendChild(incidentBeam);
+            
+            // Преломленные лучи - только те, что соответствуют фильтру
+            spectrumColors.forEach((colorInfo, index) => {
+                // Для белого фильтра показываем все цвета, для цветных - только соответствующие
+                if (currentFilterType !== 'white' && colorInfo.filter !== currentFilterType) {
+                    return;
+                }
+                
+                const refractedBeam = document.createElement('div');
+                refractedBeam.className = 'refracted-beam';
+                
+                const beamLength = 200 + index * 6;
+                
+                refractedBeam.style.width = beamLength + 'px';
+                refractedBeam.style.left = (prismRect.right - containerRect.left - 25) + 'px';
+                refractedBeam.style.top = (prismCenterY - 2) + 'px';
+                refractedBeam.style.background = colorInfo.color;
+                refractedBeam.style.boxShadow = `0 0 10px ${colorInfo.color}`;
+                refractedBeam.style.transform = `rotate(${colorInfo.angle}deg)`;
+                
+                // Подпись для некоторых лучей
+                if (index % 3 === 0) {
+                    const label = document.createElement('div');
+                    label.className = 'wavelength-label';
+                    label.textContent = `${colorInfo.wavelength} нм`;
+                    label.style.left = (beamLength - 45) + 'px';
+                    label.style.top = (colorInfo.angle > 0 ? -25 : 12) + 'px';
+                    refractedBeam.appendChild(label);
+                }
+                
+                document.querySelector('.demo-area').appendChild(refractedBeam);
+                
+                // Анимация появления
+                refractedBeam.style.opacity = '0';
+                refractedBeam.animate([
+                    { opacity: 0, transform: `rotate(${colorInfo.angle}deg) scaleX(0)` },
+                    { opacity: 1, transform: `rotate(${colorInfo.angle}deg) scaleX(1)` }
+                ], {
+                    duration: 600,
+                    easing: 'ease-out'
+                });
+                refractedBeam.style.opacity = '1';
+            });
+        }
+
+        // Инициализация - запускаем сразу
+        updatePrismDemo();
+    </script>
+</body>
+</html>
