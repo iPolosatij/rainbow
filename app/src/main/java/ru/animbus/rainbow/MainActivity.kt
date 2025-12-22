@@ -31,8 +31,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or

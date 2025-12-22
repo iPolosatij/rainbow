@@ -2,7 +2,12 @@
 <html>
 <head>
     <title>Длина световой волны</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -13,8 +18,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
         }
+
         .container {
+            width: 100%;
             max-width: 800px;
             margin: 0 auto;
             background: rgba(255,255,255,0.1);
@@ -23,13 +31,18 @@
             backdrop-filter: blur(10px);
             text-align: center;
         }
+
         h1 {
             color: #3498db;
             margin-bottom: 20px;
+            font-size: clamp(1.5rem, 4vw, 2rem);
         }
+
         .wave-container {
-            width: 500px;
-            height: 500px;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            aspect-ratio: 1/1;
             position: relative;
             margin: 20px auto;
             border: 2px solid rgba(255,255,255,0.3);
@@ -37,27 +50,37 @@
             overflow: hidden;
             background: #0a1929;
         }
+
         .control-panel {
             background: rgba(52, 73, 94, 0.8);
             padding: 20px;
             border-radius: 10px;
             margin: 20px 0;
-            width: 500px;
+            width: 100%;
+            max-width: 500px;
         }
+
         .slider-container {
             margin: 20px 0;
         }
+
         input[type="range"] {
             width: 100%;
             height: 25px;
         }
+
         .wavelength-display {
-            font-size: 24px;
+            font-size: clamp(18px, 4vw, 24px);
             margin: 15px 0;
             padding: 15px;
             background: rgba(52, 152, 219, 0.3);
             border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
+
         .center-source {
             position: absolute;
             top: 50%;
@@ -70,6 +93,7 @@
             z-index: 10;
             transition: all 0.3s ease;
         }
+
         .wave-circle {
             position: absolute;
             top: 50%;
@@ -79,6 +103,7 @@
             transform: translate(-50%, -50%);
             animation: ripple 3s linear forwards;
         }
+
         @keyframes ripple {
             0% {
                 width: 0;
@@ -91,173 +116,287 @@
                 opacity: 0;
             }
         }
+
         .spectrum-scale {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
-            font-size: 12px;
+            font-size: clamp(10px, 2vw, 12px);
             color: #bdc3c7;
         }
+
         .color-info {
             margin-top: 10px;
-            font-size: 18px;
+            font-size: clamp(16px, 3vw, 18px);
             font-weight: bold;
+        }
+
+        /* Для очень узких экранов */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .wave-container {
+                max-width: 400px;
+            }
+
+            .control-panel, .wavelength-display {
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .wave-container {
+                max-width: 350px;
+            }
+
+            .control-panel, .wavelength-display {
+                max-width: 350px;
+            }
+
+            .center-source {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .wave-container {
+                max-width: 300px;
+            }
+
+            .control-panel, .wavelength-display {
+                max-width: 300px;
+            }
+
+            .center-source {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        /* Для горизонтальной ориентации */
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 20px;
+                max-width: 100%;
+            }
+
+            h1 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .wave-container {
+                max-width: 300px;
+                margin: 0;
+            }
+
+            .control-panel {
+                max-width: 400px;
+                margin: 0;
+                align-self: stretch;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .wavelength-display {
+                max-width: 400px;
+                margin: 0;
+                align-self: stretch;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌊 Длина световой волны</h1>
+<div class="container">
+    <h1>🌊 Длина световой волны</h1>
 
-        <div class="wave-container" id="waveContainer">
-            <div class="center-source" id="centerSource"></div>
-        </div>
+    <div class="wave-container" id="waveContainer">
+        <div class="center-source" id="centerSource"></div>
+    </div>
 
-        <div class="control-panel">
-            <div class="slider-container">
-                <label>📏 Длина волны:</label>
-                <input type="range" id="wavelengthSlider" min="380" max="750" value="550">
-                <div class="spectrum-scale">
-                    <span>380 нм</span>
-                    <span>450 нм</span>
-                    <span>500 нм</span>
-                    <span>570 нм</span>
-                    <span>590 нм</span>
-                    <span>620 нм</span>
-                    <span>750 нм</span>
-                </div>
+    <div class="control-panel">
+        <div class="slider-container">
+            <label>📏 Длина волны:</label>
+            <input type="range" id="wavelengthSlider" min="380" max="750" value="550">
+            <div class="spectrum-scale">
+                <span>380 нм</span>
+                <span>450 нм</span>
+                <span>500 нм</span>
+                <span>570 нм</span>
+                <span>590 нм</span>
+                <span>620 нм</span>
+                <span>750 нм</span>
             </div>
-        </div>
-
-        <div class="wavelength-display">
-            <div id="currentWavelength">550 нанометров</div>
-            <div class="color-info" id="currentColorName">Зеленый свет</div>
         </div>
     </div>
 
-    <script>
-        const waveContainer = document.getElementById('waveContainer');
-        const centerSource = document.getElementById('centerSource');
-        const wavelengthSlider = document.getElementById('wavelengthSlider');
-        const currentWavelength = document.getElementById('currentWavelength');
-        const currentColorName = document.getElementById('currentColorName');
+    <div class="wavelength-display">
+        <div id="currentWavelength">550 нанометров</div>
+        <div class="color-info" id="currentColorName">Зеленый свет</div>
+    </div>
+</div>
 
-        let currentWavelengthValue = 550;
-        let waveInterval = null;
-        let lastWaveTime = 0;
+<script>
+    const waveContainer = document.getElementById('waveContainer');
+    const centerSource = document.getElementById('centerSource');
+    const wavelengthSlider = document.getElementById('wavelengthSlider');
+    const currentWavelength = document.getElementById('currentWavelength');
+    const currentColorName = document.getElementById('currentColorName');
 
-        // Функция для преобразования длины волны в RGB цвет
-        function wavelengthToColor(wavelength) {
-            let r, g, b;
-            
-            if (wavelength >= 380 && wavelength < 440) {
-                r = 0.3 + 0.7 * (wavelength - 380) / (440 - 380);
-                g = 0.0;
-                b = 0.8 + 0.2 * (wavelength - 380) / (440 - 380);
-            } else if (wavelength >= 440 && wavelength < 490) {
-                r = 0.0;
-                g = 0.0 + 1.0 * (wavelength - 440) / (490 - 440);
-                b = 1.0;
-            } else if (wavelength >= 490 && wavelength < 510) {
-                r = 0.0;
-                g = 1.0;
-                b = 1.0 - 1.0 * (wavelength - 490) / (510 - 490);
-            } else if (wavelength >= 510 && wavelength < 580) {
-                r = 0.0 + 1.0 * (wavelength - 510) / (580 - 510);
-                g = 1.0;
-                b = 0.0;
-            } else if (wavelength >= 580 && wavelength < 645) {
-                r = 1.0;
-                g = 1.0 - 1.0 * (wavelength - 580) / (645 - 580);
-                b = 0.0;
-            } else {
-                r = 1.0;
-                g = 0.0;
-                b = 0.0;
+    let currentWavelengthValue = 550;
+    let waveInterval = null;
+    let lastWaveTime = 0;
+
+    // Функция для преобразования длины волны в RGB цвет
+    function wavelengthToColor(wavelength) {
+        let r, g, b;
+
+        if (wavelength >= 380 && wavelength < 440) {
+            r = 0.3 + 0.7 * (wavelength - 380) / (440 - 380);
+            g = 0.0;
+            b = 0.8 + 0.2 * (wavelength - 380) / (440 - 380);
+        } else if (wavelength >= 440 && wavelength < 490) {
+            r = 0.0;
+            g = 0.0 + 1.0 * (wavelength - 440) / (490 - 440);
+            b = 1.0;
+        } else if (wavelength >= 490 && wavelength < 510) {
+            r = 0.0;
+            g = 1.0;
+            b = 1.0 - 1.0 * (wavelength - 490) / (510 - 490);
+        } else if (wavelength >= 510 && wavelength < 580) {
+            r = 0.0 + 1.0 * (wavelength - 510) / (580 - 510);
+            g = 1.0;
+            b = 0.0;
+        } else if (wavelength >= 580 && wavelength < 645) {
+            r = 1.0;
+            g = 1.0 - 1.0 * (wavelength - 580) / (645 - 580);
+            b = 0.0;
+        } else {
+            r = 1.0;
+            g = 0.0;
+            b = 0.0;
+        }
+
+        r = Math.floor(r * 255);
+        g = Math.floor(g * 255);
+        b = Math.floor(b * 255);
+
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // Функция для получения названия цвета
+    function getColorName(wavelength) {
+        if (wavelength < 450) return "Фиолетовый";
+        if (wavelength < 485) return "Синий";
+        if (wavelength < 500) return "Голубой";
+        if (wavelength < 565) return "Зеленый";
+        if (wavelength < 590) return "Желтый";
+        if (wavelength < 625) return "Оранжевый";
+        return "Красный";
+    }
+
+    // Функция для создания одной волны
+    function createWave() {
+        const now = Date.now();
+        // Интервал между волнами зависит от длины волны
+        const minInterval = (currentWavelengthValue / 750) * 1000 + 200;
+        if (now - lastWaveTime < minInterval) return;
+
+        lastWaveTime = now;
+
+        const wave = document.createElement('div');
+        wave.className = 'wave-circle';
+
+        const color = wavelengthToColor(currentWavelengthValue);
+        wave.style.borderColor = color;
+        wave.style.boxShadow = `0 0 10px ${color}`;
+        wave.style.animationDuration = '3s';
+
+        waveContainer.appendChild(wave);
+
+        setTimeout(() => {
+            if (wave.parentNode) {
+                wave.parentNode.removeChild(wave);
             }
-            
-            r = Math.floor(r * 255);
-            g = Math.floor(g * 255);
-            b = Math.floor(b * 255);
-            
-            return `rgb(${r}, ${g}, ${b})`;
+        }, 3000);
+    }
+
+    // Функция обновления
+    function updateInterface() {
+        currentWavelengthValue = parseInt(wavelengthSlider.value);
+
+        // Обновляем отображение
+        currentWavelength.textContent = `${currentWavelengthValue} нанометров`;
+        currentColorName.textContent = `${getColorName(currentWavelengthValue)} свет`;
+
+        // Обновляем цвет центрального шара
+        const color = wavelengthToColor(currentWavelengthValue);
+        centerSource.style.background = color;
+        centerSource.style.boxShadow = `0 0 30px ${color}`;
+
+        // Обновляем цвет текста
+        currentColorName.style.color = color;
+
+        // Перезапускаем интервал
+        if (waveInterval) {
+            clearInterval(waveInterval);
         }
 
-        // Функция для получения названия цвета
-        function getColorName(wavelength) {
-            if (wavelength < 450) return "Фиолетовый";
-            if (wavelength < 485) return "Синий";
-            if (wavelength < 500) return "Голубой";
-            if (wavelength < 565) return "Зеленый";
-            if (wavelength < 590) return "Желтый";
-            if (wavelength < 625) return "Оранжевый";
-            return "Красный";
+        // Создаем волны с интервалом, зависящим от длины волны
+        // Короткие волны - чаще, длинные - реже
+        const interval = (currentWavelengthValue / 750) * 800 + 200;
+        waveInterval = setInterval(createWave, interval);
+
+        // Очищаем старые волны
+        document.querySelectorAll('.wave-circle').forEach(wave => wave.remove());
+
+        // Создаем первую волну сразу
+        createWave();
+    }
+
+    // Обработчик события
+    wavelengthSlider.addEventListener('input', updateInterface);
+
+    // Инициализация
+    updateInterface();
+
+    // Адаптация при изменении размера окна
+    function adjustForScreen() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const isSmallHeight = window.innerHeight < 500;
+
+        if (isLandscape && isSmallHeight) {
+            document.body.classList.add('landscape-mode');
+        } else {
+            document.body.classList.remove('landscape-mode');
         }
+    }
 
-        // Функция для создания одной волны
-        function createWave() {
-            const now = Date.now();
-            // Интервал между волнами зависит от длины волны
-            const minInterval = (currentWavelengthValue / 750) * 1000 + 200;
-            if (now - lastWaveTime < minInterval) return;
-            
-            lastWaveTime = now;
-            
-            const wave = document.createElement('div');
-            wave.className = 'wave-circle';
-            
-            const color = wavelengthToColor(currentWavelengthValue);
-            wave.style.borderColor = color;
-            wave.style.boxShadow = `0 0 10px ${color}`;
-            wave.style.animationDuration = '3s';
-            
-            waveContainer.appendChild(wave);
-            
-            setTimeout(() => {
-                if (wave.parentNode) {
-                    wave.parentNode.removeChild(wave);
-                }
-            }, 3000);
-        }
+    window.addEventListener('resize', adjustForScreen);
+    window.addEventListener('orientationchange', adjustForScreen);
 
-        // Функция обновления
-        function updateInterface() {
-            currentWavelengthValue = parseInt(wavelengthSlider.value);
-            
-            // Обновляем отображение
-            currentWavelength.textContent = `${currentWavelengthValue} нанометров`;
-            currentColorName.textContent = `${getColorName(currentWavelengthValue)} свет`;
-            
-            // Обновляем цвет центрального шара
-            const color = wavelengthToColor(currentWavelengthValue);
-            centerSource.style.background = color;
-            centerSource.style.boxShadow = `0 0 30px ${color}`;
-            
-            // Обновляем цвет текста
-            currentColorName.style.color = color;
-            
-            // Перезапускаем интервал
-            if (waveInterval) {
-                clearInterval(waveInterval);
-            }
-            
-            // Создаем волны с интервалом, зависящим от длины волны
-            // Короткие волны - чаще, длинные - реже
-            const interval = (currentWavelengthValue / 750) * 800 + 200;
-            waveInterval = setInterval(createWave, interval);
-            
-            // Очищаем старые волны
-            document.querySelectorAll('.wave-circle').forEach(wave => wave.remove());
-            
-            // Создаем первую волну сразу
-            createWave();
-        }
-
-        // Обработчик события
-        wavelengthSlider.addEventListener('input', updateInterface);
-
-        // Инициализация
-        updateInterface();
-    </script>
+    // Вызываем сразу
+    adjustForScreen();
+</script>
 </body>
 </html>
